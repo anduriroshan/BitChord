@@ -24,7 +24,7 @@ class GroqLLM(LLM):
 
     def __init__(self, model: str = "meta-llama/llama-4-scout-17b-16e-instruct", api_key: str = None):
         super().__init__(model)
-        self.api_key = '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'
+        self.api_key = api_key or os.getenv("GROQ_API_KEY")
         if not self.api_key:
             raise ValueError("Groq API key not provided. Set GROQ_API_KEY env variable.")
 
