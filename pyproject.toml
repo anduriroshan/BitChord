@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "orchestrator"
+version = "0.1.0"
+authors = [
+  { name="Anduri Roshan", email="roshanandhuri@gmail.com" },
+]
+description = "A Python framework for orchestrating workflows with LLMs."
+readme = "README.md"
+license = { file="LICENSE" }
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "aiohttp",
+    "llama-cpp-python",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/your-username/bitchord"
+"Bug Tracker" = "https://github.com/your-username/bitchord/issues"
