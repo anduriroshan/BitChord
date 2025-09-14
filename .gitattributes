@@ -1,1 +1,2 @@
 bitchord/llms/models/ggml-model-i2_s.gguf filter=lfs diff=lfs merge=lfs -text
+/home/roshan/Downloads/BitChord/bitchord/llms/models/ggml-model-i2_s.gguf filter=lfs diff=lfs merge=lfs -text
