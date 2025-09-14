@@ -1,30 +1,47 @@
 import asyncio
+import importlib.resources
 from pathlib import Path
-from llama_cpp import Llama  # pip install llama-cpp-python
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
 class LocalLLM:
     """
-    Minimal wrapper around a local quantized model (e.g., BitNet 1.58-bit GGUF).
-    Usage:
-        llm = LocalLLM(model_path="models/bitnet-1.58b.gguf")
-        text = await llm.generate("Hello world")
+    Minimal wrapper around a local quantized model using transformers.
+    This is designed for a fully offline package.
     """
 
-    def __init__(self, model_path: str, n_ctx: int = 2048, n_threads: int = 4):
-        model_file = Path(model_path)
-        if not model_file.exists():
-            raise FileNotFoundError(
-                f"Model file not found at {model_path}. "
-                "Download a GGUF quantized BitNet model first."
+    def __init__(self, model_filename: str = "ggml-model-i2_s.gguf"):
+        try:
+            with importlib.resources.path("bitchord.llms", "models") as models_dir_context:
+                models_path = Path(str(models_dir_context))
+                
+                tokenizer_path = models_path
+                model_file_path = models_path / model_filename
+
+                if not model_file_path.is_file():
+                    raise FileNotFoundError(f"Model file not found: {model_file_path}")
+
+                self.tokenizer = AutoTokenizer.from_pretrained(str(tokenizer_path))
+                self.model = AutoModelForCausalLM.from_pretrained(str(model_file_path))
+
+        except Exception as e:
+            raise RuntimeError(
+                f"Failed to load offline model/tokenizer. Ensure files are in 'bitchord/llms/models/'. Error: {e}"
             )
-        self.model = Llama(model_path=str(model_file), n_ctx=n_ctx, n_threads=n_threads)
 
     async def generate(self, prompt: str, max_tokens: int = 256) -> str:
         """
         Run the local model asynchronously so it matches our LLM interface.
         """
         loop = asyncio.get_event_loop()
-        result = await loop.run_in_executor(
-            None, lambda: self.model(prompt, max_tokens=max_tokens)
-        )
-        return result["choices"][0]["text"].strip()
+
+        def _blocking_generate():
+            inputs = self.tokenizer(prompt, return_tensors="pt")
+            outputs = self.model.generate(**inputs, max_new_tokens=max_tokens)
+            text = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+            # The decoded text might include the prompt.
+            if text.startswith(prompt):
+                return text[len(prompt):].strip()
+            return text.strip()
+
+        result = await loop.run_in_executor(None, _blocking_generate)
+        return result

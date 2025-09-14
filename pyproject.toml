@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "orchestrator"
+name = "bitchord"
 version = "0.1.0"
 authors = [
   { name="Anduri Roshan", email="roshanandhuri@gmail.com" },
@@ -19,9 +19,16 @@ classifiers = [
 ]
 dependencies = [
     "aiohttp",
-    "llama-cpp-python",
+    "transformers",
+    "torch",
+    "accelerate",
+    "sentencepiece",
+    "llama-cpp-python==0.1.76",
 ]
 
 [project.urls]
 "Homepage" = "https://github.com/anduriroshanbitchord"
 "Bug Tracker" = "https://github.com/anduriroshan/bitchord/issues"
+
+[tool.setuptools]
+package-data = {"bitchord.llms.models" = ["*.gguf"]}
