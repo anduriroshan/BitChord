@@ -19,10 +19,6 @@ classifiers = [
 ]
 dependencies = [
     "aiohttp",
-    "transformers",
-    "torch",
-    "accelerate",
-    "sentencepiece",
     "llama-cpp-python==0.1.76",
 ]
 
